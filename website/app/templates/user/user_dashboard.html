@@ -1,0 +1,73 @@
+{% extends "user/user_base.html" %}
+{% block title %}Мої заявки{% endblock %}
+
+{% block content %}
+<div class="activity">
+    <div class="activity-data">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Тип</th>
+                    <th>Текст</th>
+                    <th>Статус</th>
+                    <th>Створено</th>
+                    <th>Завершено</th>
+                    <th>Виконавець</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            
+
+<tbody>
+    {% for task in tasks %}
+        {# B-) Знаходимо ПРАВИЛЬНЕ призначення для відображення #}
+        {% set assignment_to_display = None %}
+        {# Спочатку пробуємо знайти активне #}
+        {% set current_assignment = task.current_assignment %}
+        {% if current_assignment %}
+            {% set assignment_to_display = current_assignment %}
+        {# Якщо активного немає І завдання закрите/скасоване, шукаємо останнє неактивне #}
+        {% elif task.status in [TaskStatusEnum.CLOSED, TaskStatusEnum.CANCELLED] %}
+            {# Припускаємо, що assignments_history - це dynamic relationship #}
+            {% set assignment_to_display = task.assignments_history.order_by(db.desc(WorkerTask.assigned_at)).first() %}
+        {% endif %}
+
+    <tr>
+        <td>{{ task.id }}</td>
+        <td>{{ task.active_task_type.name if task.active_task_type else 'N/A' }}</td>
+        <td title="{{ task.text }}">{{ task.text|truncate(80) }}</td>
+        <td>{{ task.status.value|replace('_', ' ')|title }}</td>
+        <td>{{ task.created_at.strftime('%d.%m.%Y %H:%M') }}</td>
+        <td>{{ task.finished_at.strftime('%d.%m.%Y %H:%M') if task.finished_at else '-' }}</td>
+        <td>
+            {# B-) Використовуємо assignment_to_display, яке ми знайшли #}
+            {% if assignment_to_display and assignment_to_display.worker %}
+                <span title="Email: {{ assignment_to_display.worker.email }}&#10;Телефон: {{ assignment_to_display.worker.phone }}">
+                    {{ assignment_to_display.worker.full_name }}
+                </span>
+            {% else %}
+                <span class="text-muted">Не призначено</span>
+            {% endif %}
+        </td>
+        <td>
+            {% if task.status not in [TaskStatusEnum.CLOSED, TaskStatusEnum.CANCELLED] %}
+                <form method="POST" action="{{ url_for('user_views.cancel_request', task_id=task.id) }}" style="display:inline;"
+                      onsubmit="return confirm('Ви впевнені?');">
+                    <button type="submit" class="btn btn-sm btn-danger">
+                        Скасувати
+                    </button>
+                </form>
+            {% endif %}
+        </td>
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="8">Ви ще не створили жодної заявки.</td>
+    </tr>
+    {% endfor %}
+</tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

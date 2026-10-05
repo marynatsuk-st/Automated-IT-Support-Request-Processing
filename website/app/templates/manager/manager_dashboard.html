@@ -1,0 +1,55 @@
+{% extends "manager/manager_base.html" %}
+
+{% block title %}Керування заявками{% endblock %}
+
+{% block content %}
+<div class="top">
+    <i class="uil uil-bars sidebar-toggle"></i>
+    <div class="search-box">
+        <i class="uil uil-search"></i>
+        <input type="text" placeholder="Пошук завдань...">
+    </div>
+</div>
+
+<div class="activity">
+
+    <div class="activity-data">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID Завдання</th>
+                    <th>Тип</th>
+                    <th>Замовник</th>
+                    <th>Відділ замовника</th>
+                    <th>Виконавець</th>
+                    <th>Статус завдання</th>
+                    <th>Метод призначення</th>
+                    <th>Дата призначення</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody id="managerTableBody">
+                {% for assignment in assignments %}
+                <tr>
+                    <td>{{ assignment.task.id }}</td>
+                    <td>{{ assignment.task.active_task_type.name if assignment.task.active_task_type else 'N/A' }}</td>
+                    <td>{{ assignment.task.customer.full_name if assignment.task.customer else 'N/A' }}</td>
+                    <td>{{ assignment.task.customer.current_department.name if assignment.task.customer and assignment.task.customer.current_department else 'N/A' }}</td>
+                    <td>{{ assignment.worker.full_name if assignment.worker else 'Не призначено' }}</td>
+                    <td>{{ assignment.status.value|replace('_', ' ')|title }}</td>
+                    <td>{{ assignment.assign_method.value|replace('_', ' ')|title }}</td>
+                    <td>{{ assignment.assigned_at.strftime("%d.%m.%Y %H:%M") }}</td>
+                    <td>
+                        <a href="{{ url_for('manager_views.edit_request', workertask_id=assignment.id) }}" class="btn-action">Переглянути</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="9">Немає завдань, призначених вашим підлеглим.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

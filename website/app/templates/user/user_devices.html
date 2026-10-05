@@ -1,0 +1,128 @@
+{% extends "user/user_base.html" %}
+{% block title %}Мої пристрої{% endblock %}
+
+{% block content %}
+<div class="content-container">
+
+    <div class="table-section">
+        <h2>Мої поточні пристрої</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Назва</th>
+                    <th>Тип</th>
+                    <th>Серійний номер</th>
+                    <th>Статус</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for assignment in assignments %}
+                <tr>
+                    <td>{{ assignment.device.name }}</td>
+                    <td>{{ assignment.device.device_type.name }}</td>
+                    <td>{{ assignment.device.serial_number }}</td>
+                    <td>{{ assignment.device.status.value|title }}</td>
+                    <td>
+                        {# --- ОНОВЛЕНА ФОРМА ПОВЕРНЕННЯ --- #}
+                    <form action="{{ url_for('user_views.return_device', device_worker_id=assignment.id) }}" {# Змінено endpoint та параметр #}
+                          method="POST"
+                          style="display: inline;"
+                          onsubmit="return confirm('Ви впевнені, що хочете повернути цей пристрій?')">
+                        <button type="submit"
+                                class=" btn btn-action"
+                                {# Кнопка активна тільки якщо статус 'IN_USE' #}
+                                {% if assignment.device.status != DeviceStatusEnum.IN_USE %}
+                                    disabled
+                                    title="Повернути можна лише пристрій зі статусом 'In Use'."
+                                {% endif %}>
+                            Повернути
+                        </button>
+                    </form>
+
+                        <button type="button"
+        class="btn-action btn-warning"
+        data-toggle="modal" {# <-- Каже Bootstrap: "Ця кнопка відкриває модальне вікно" #}
+        data-target="#repairModal" {# <-- Каже Bootstrap: "Вікно, яке треба відкрити, має id='repairModal'" #}
+        data-device-id="{{ assignment.device.id }}" {# <-- Зберігаємо ID пристрою для JS #}
+        data-device-name="{{ assignment.device.name }}" {# <-- Зберігаємо назву для JS #}
+        {% if assignment.device.status != DeviceStatusEnum.IN_USE %}
+            disabled
+            title="..."
+        {% endif %}>
+    Ремонт
+</button>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5">За вами не закріплено жодного пристрою.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="modal fade" id="repairModal" ...>
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="repairForm" method="POST"> {# Action встановлюється через JS #}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="repairModalLabel">Запит на ремонт пристрою</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Пристрій: <strong id="modalDeviceName"></strong></p>
+                    <div class="form-group">
+                        <label for="problem_description">Опишіть проблему:</label>
+                        {# --- Переконайтесь, що це поле є і має правильний name --- #}
+                        <textarea class="form-control"
+                                  id="problem_description"
+                                  name="problem_description" {# <-- Важливо! #}
+                                  rows="3" required minlength="10"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрити</button>
+                    <button type="submit" class="btn btn-danger">Відправити запит</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+{# Додаємо jQuery та Bootstrap JS для роботи модального вікна #}
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+<script>
+    // Скрипт для модального вікна "Запит на ремонт"
+    // Використовує jQuery для обробки подій Bootstrap
+    $('#repairModal').on('show.bs.modal', function (event) {
+        // 1. Отримуємо кнопку, яка викликала модальне вікно
+        var button = $(event.relatedTarget); 
+        
+        // 2. Витягуємо дані про пристрій з data-атрибутів кнопки
+        var deviceId = button.data('device-id'); 
+        var deviceName = button.data('device-name'); 
+        
+        // 3. Знаходимо елементи всередині модального вікна
+        var modal = $(this);
+        modal.find('.modal-title').text('Запит на ремонт: ' + deviceName); // Встановлюємо заголовок
+        modal.find('#modalDeviceName').text(deviceName); // Встановлюємо назву пристрою в тілі вікна
+        
+        // 4. Встановлюємо правильний URL (action) для форми всередині вікна
+        var form = modal.find('#repairForm');
+        // Формуємо URL для відправки POST-запиту на сервер
+        form.attr('action', `/user/request_repair/${deviceId}`); 
+    });
+</script>
+{% endblock %}
+

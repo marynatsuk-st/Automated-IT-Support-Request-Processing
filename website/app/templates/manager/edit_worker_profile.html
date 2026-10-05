@@ -1,0 +1,53 @@
+{% extends "manager/manager_base.html" %}
+{% block title %}Редагувати профіль: {{ worker.full_name }}{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <h2>Редагувати профіль: {{ worker.full_name }}</h2>
+    <p><strong>Посада:</strong> {{ worker.current_department_record.title if worker.current_department_record else 'N/A' }}</p>
+
+    <form method="POST" class="simple-form">
+        <hr>
+        <h3>Компетенції</h3>
+        <p class="form-description">Оберіть типи завдань, які може виконувати цей працівник.</p>
+        <div class="checkbox-group">
+            {% for task_type in all_task_types %}
+                <div class="checkbox-item">
+                    <input type="checkbox" 
+                           name="tasktypes" 
+                           value="{{ task_type.tasktype_id }}" 
+                           id="type-{{ task_type.tasktype_id }}"
+                           {# B-) Дуже проста перевірка для встановлення 'checked' #}
+                           {% if task_type.tasktype_id in current_competency_ids %}checked{% endif %}>
+                    <label for="type-{{ task_type.tasktype_id }}">{{ task_type.name }}</label>
+                </div>
+            {% endfor %}
+        </div>
+
+        <hr>
+        <h3>Статус працівника</h3>
+        <div class="form-group">
+            <label for="worker_status">Статус:</label>
+            <select name="worker_status" id="worker_status" class="form-control">
+                {% for status in status_options %}
+                    <option value="{{ status.value }}" {% if worker.worker_status == status %}selected{% endif %}>
+                        {{ status.value.replace('_', ' ')|title }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="unavailable_until">Недоступний до:</label>
+            <input type="date" class="form-control" id="unavailable_until" name="unavailable_until"
+                   value="{{ worker.unavailable_until.strftime('%Y-%m-%d') if worker.unavailable_until else '' }}">
+            <small>Заповнюйте тільки для статусу "On Vacation".</small>
+        </div>
+
+        <div class="button-group">
+            <button type="submit" class="btn btn-primary">Зберегти зміни</button>
+            <a href="{{ url_for('manager_views.manage_workers') }}" class="btn btn-cancel">Скасувати</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

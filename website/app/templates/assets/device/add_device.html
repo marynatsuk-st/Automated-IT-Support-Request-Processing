@@ -1,0 +1,98 @@
+{% extends "admin/admin_base.html" %}
+{% block title %}Додати новий пристрій{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <div class="form-section">
+        <h2>Додавання нового пристрою</h2>
+        <form method="POST" class="simple-form">
+            <div class="form-group">
+                <label for="name">Назва пристрою (Модель)</label>
+                <input type="text" id="name" name="name" placeholder="Наприклад, HP ProBook 450 G8" required>
+            </div>
+            <div class="form-group">
+                <label for="serial_number">Серійний номер</label>
+                <input type="text" id="serial_number" name="serial_number" placeholder="Унікальний серійний номер" required>
+            </div>
+            <div class="form-group">
+                <label for="device_type_id">Тип пристрою</label>
+                <select id="device_type_id" name="device_type_id" required>
+                    <option value="" disabled selected>Оберіть тип пристрою...</option>
+                    {% for type in device_types %}
+                        <option value="{{ type.id }}">{{ type.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <hr>
+            <h3>Характеристики</h3>
+            <div id="attributes-container">
+                <p>Будь ласка, спочатку оберіть тип пристрою.</p>
+            </div>
+            
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">Зберегти пристрій</button>
+                <a href="{{ url_for('asset_views.view_devices') }}" class="btn btn-cancel">Скасувати</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const typeSelect = document.getElementById('device_type_id');
+        const attributesContainer = document.getElementById('attributes-container');
+
+        typeSelect.addEventListener('change', function() {
+            const typeId = this.value;
+            attributesContainer.innerHTML = '<p>Завантаження характеристик...</p>'; // Індикатор завантаження
+
+            if (!typeId) {
+                attributesContainer.innerHTML = '<p>Будь ласка, спочатку оберіть тип пристрою.</p>';
+                return;
+            }
+
+            // Робимо AJAX-запит до нашого нового API
+            fetch(`/assets/api/attributes/${typeId}`)
+                .then(response => response.json())
+                .then(attributes => {
+                    attributesContainer.innerHTML = ''; // Очищуємо контейнер
+                    if (attributes.length === 0) {
+                        attributesContainer.innerHTML = '<p>Для цього типу пристроїв не визначено жодних характеристик.</p>';
+                    } else {
+                        attributes.forEach(attr => {
+                            // Для кожного атрибута створюємо свій form-group
+                            const formGroup = document.createElement('div');
+                            formGroup.className = 'form-group';
+                            
+                            const label = document.createElement('label');
+                            label.htmlFor = `attr_${attr.id}`;
+                            label.textContent = attr.name;
+                            
+                            const input = document.createElement('input');
+                            // B-) Визначаємо тип поля вводу на основі data_type!
+                            if (attr.data_type === 'integer' || attr.data_type === 'decimal') {
+                                input.type = 'number';
+                                input.step = (attr.data_type === 'decimal') ? '0.1' : '1';
+                            } else {
+                                input.type = 'text'; // 'string' або 'boolean'
+                            }
+                            input.id = `attr_${attr.id}`;
+                            // Дуже важливо: name поля буде 'attr_ID', наприклад 'attr_5'
+                            input.name = `attr_${attr.id}`;
+                            input.className = 'form-control';
+                            
+                            formGroup.appendChild(label);
+                            formGroup.appendChild(input);
+                            attributesContainer.appendChild(formGroup);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching attributes:', error);
+                    attributesContainer.innerHTML = '<p>Помилка завантаження характеристик. Спробуйте оновити сторінку.</p>';
+                });
+        });
+    });
+</script>
+{% endblock %}

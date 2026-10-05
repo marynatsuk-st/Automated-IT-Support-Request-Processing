@@ -1,0 +1,26 @@
+{% extends "admin/admin_dashboard.html" %}
+{% block title %}Редагувати тип пристрою{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <div class="form-section">
+        <h2>Редагувати тип пристрою: {{ device_type.name }}</h2>
+        
+        <form method="POST" class="simple-form">
+            <div class="form-group">
+                <label for="name">Назва типу</label>
+                <input type="text" id="name" name="name" value="{{ device_type.name }}" required minlength="2">
+            </div>
+            <div class="form-group">
+                <label for="priority">Пріоритет (1-5)</label>
+                <input type="number" id="priority" name="priority" value="{{ device_type.priority }}" min="1" max="5" required>
+            </div>
+            
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">Зберегти зміни</button>
+                <a href="{{ url_for('asset_views.manage_device_types') }}" class="btn btn-cancel">Скасувати</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

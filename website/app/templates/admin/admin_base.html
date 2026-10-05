@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>{% block title %}Портал{% endblock %}</title>
+</head>
+<body>
+    
+    <nav>
+        <div class="logo-name">
+            <span class="logo_name"> IT Portal </span>
+        </div>
+        <div class="menu-items">
+           <ul class="nav-links">
+            <li><a href="{{ url_for('admin_views.admin_dashboard') }}">
+                <i class="uil uil-users-alt"></i>
+                <span class="link-name"> Користувачі </span>
+            </a></li>
+            <li><a href="{{ url_for('admin_views.create_user') }}">
+                <i class="uil uil-user-plus"></i>
+                <span class="link-name"> Створити користувача </span>
+            </a></li>
+
+            <hr> <li><a href="{{ url_for('asset_views.view_devices') }}">
+                <i class="uil uil-archive-alt"></i>
+                <span class="link-name"> Список пристроїв </span>
+            </a></li>
+            <li><a href="{{ url_for('asset_views.add_device') }}">
+                <i class="uil uil-plus-circle"></i>
+                <span class="link-name"> Додати пристрій </span>
+            </a></li>
+
+            <hr>
+            <li><a href="{{ url_for('asset_views.manage_device_types') }}">
+                <i class="uil uil-laptop"></i>
+                <span class="link-name"> Типи пристроїв </span>
+            </a></li>
+             <li><a href="{{ url_for('asset_views.manage_device_attributes') }}">
+                <i class="uil uil-analysis"></i>
+                <span class="link-name"> Атрибути пристроїв </span>
+            </a></li>
+            <li><a href="{{ url_for('asset_views.manage_task_types') }}">
+                <i class="uil uil-clipboard-notes"></i>
+                <span class="link-name"> Типи завдань </span>
+            </a></li>
+        </ul>
+
+        <ul class="logout-mod">
+                <li><a href="/logout">
+                        <i class="uil uil-signout"></i>
+                        <span class="link-name"> Sign out</span>
+                    </a></li>
+        </ul>
+        </div>
+    </nav>
+
+    <section class="dashboard">
+        
+        <div class="top">
+            <i class="uil uil-bars sidebar-toggle"></i>
+            <div class="search-box">
+                <i class="uil uil-search"></i>
+                <input type="text" placeholder="Пошук заявок...">
+            </div>
+            
+            </div>
+
+
+        {% block content %}{% endblock %}
+        
+    </section>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    {% block scripts %}
+
+    {% endblock %}
+</body>
+</html>

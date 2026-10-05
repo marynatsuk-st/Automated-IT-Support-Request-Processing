@@ -1,0 +1,49 @@
+{% extends "worker/worker_base.html" %}
+{% block title %}Завдання #{{ task.id }}: Повернення пристрою{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <div class="info-section">
+        <h2>Завдання #{{ task.id }}: {{ task.active_task_type.name }}</h2>
+        <p><strong>Замовник (Ініціатор):</strong> {{ task.customer.full_name }} (Відділ: {{ task.customer.current_department.name }})</p>
+        <p><strong>Створено:</strong> {{ task.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+        <p><strong>Поточний статус завдання:</strong> {{ assignment.status.value|title }}</p>
+        <hr>
+        <h4>Інформація про пристрій, що повертається:</h4>
+        <p><strong>Назва:</strong> {{ device.name }}</p>
+        <p><strong>Тип:</strong> {{ device.device_type.name }}</p>
+        <p><strong>Серійний номер:</strong> {{ device.serial_number }}</p>
+        <p><strong>Поточний статус пристрою:</strong> {{ device.status.value|title }}</p>
+        <hr>
+        <h4>Текст заявки:</h4>
+        <pre>{{ task.text }}</pre>
+    </div>
+
+    <hr>
+
+    <div class="form-section">
+        <h3>Опрацювати повернення</h3>
+        <p>Вкажіть, в якому стані пристрій і що з ним робити далі.</p>
+        <form method="POST" class="simple-form">
+            <div class="form-group">
+                <label>Оберіть новий статус пристрою:</label>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="new_status" value="available" checked>
+                        Придатний до використання (Available)
+                    </label>
+                    <label>
+                        <input type="radio" name="new_status" value="under_repair">
+                        Потребує ремонту (Under Repair)
+                    </label>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">Завершити повернення</button>
+                <a href="{{ url_for('worker_views.worker_dashboard') }}" class="btn btn-cancel">Повернутися до списку</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

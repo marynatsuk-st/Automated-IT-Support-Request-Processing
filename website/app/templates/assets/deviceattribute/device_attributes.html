@@ -1,0 +1,68 @@
+{% extends "admin/admin_base.html" %}
+{% block title %}Керування атрибутами пристроїв{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <div class="form-section">
+        <h2>Створити новий атрибут</h2>
+        <p class="form-description">Атрибути — це характеристики, які можна буде вказувати для пристроїв (напр., "RAM (GB)", "Діагональ екрану", "Швидкість друку").</p>
+        <form method="POST" class="simple-form">
+            <div class="form-group">
+                <label for="name">Назва атрибуту</label>
+                <input type="text" id="name" name="name" placeholder='Наприклад, "RAM (GB)"' required minlength="2">
+            </div>
+            <div class="form-group">
+                <label for="data_type">Тип даних</label>
+                <select id="data_type" name="data_type" required>
+                    <option value="" disabled selected>Оберіть тип</option>
+                    {% for option in data_type_options %}
+                        <option value="{{ option }}">{{ option|title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Створити</button>
+        </form>
+    </div>
+</div>
+    <hr>
+<div class="activity">
+    <div class="activity-data">
+    <div class="table-section">
+        <h2>Існуючі атрибути</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Назва</th>
+                    <th>Тип даних</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for attribute in attributes %}
+                <tr>
+                    <td>{{ attribute.id }}</td>
+                    <td>{{ attribute.name }}</td>
+                    <td>{{ attribute.data_type }}</td>
+                    <td>
+                        <a href="{{ url_for('asset_views.edit_device_attribute', attribute_id=attribute.id) }}" class="btn btn-primary">Редагувати</a> | 
+                        <form action="{{ url_for('asset_views.delete_device_attribute', attribute_id=attribute.id) }}" method="POST" style="display: inline;">
+                        <button type="submit" 
+                                class="btn btn-danger"
+                                onclick="return confirm('Ви впевнені, що хочете видалити цей атрибут? Цю дію не можна буде скасувати.')">
+                            Видалити
+                        </button>
+                    </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4">Жодного атрибуту ще не створено.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </div>
+</div>
+{% endblock %}

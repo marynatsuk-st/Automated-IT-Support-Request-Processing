@@ -1,0 +1,39 @@
+{% extends "admin/admin_base.html" %}
+{% block title %}Редагувати атрибут{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <div class="form-section">
+        <h2>Редагувати атрибут: {{ attribute.name }}</h2>
+        
+        <form method="POST" class="simple-form">
+            <div class="form-group">
+                <label for="name">Назва атрибуту</label>
+                <input type="text" 
+                       id="name" 
+                       name="name" 
+                       value="{{ attribute.name }}" 
+                       required 
+                       minlength="2">
+            </div>
+            
+            <div class="form-group">
+                <label for="data_type">Тип даних</label>
+                <select id="data_type" name="data_type" required>
+                    {% for option in data_type_options %}
+                        <option value="{{ option }}" 
+                                {% if attribute.data_type == option %}selected{% endif %}>
+                            {{ option|title }} {# Робить 'string' -> 'String' #}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">Зберегти зміни</button>
+                <a href="{{ url_for('asset_views.manage_device_attributes') }}" class="btn btn-cancel">Скасувати</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

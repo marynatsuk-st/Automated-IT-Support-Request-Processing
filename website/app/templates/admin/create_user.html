@@ -1,0 +1,120 @@
+{% extends "admin/admin_base.html" %} 
+{% block title %}Створити користувача{% endblock %} 
+
+{% block content %}
+<h1>Створення нового користувача</h1>
+
+<form method="POST" class="form-container">
+    <div class="left-column">
+        <div class="form-group">
+            <label for="name">Ім'я (First Name)</label>
+            <input type="text" class="form-control" id="name" name="name" placeholder="Введіть ім'я" required/> 
+        </div>
+        <div class="form-group">
+            <label for="surname">Прізвище (Last Name)</label>
+            <input type="text" class="form-control" id="surname" name="surname" placeholder="Введіть прізвище" required/> 
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" class="form-control" id="email" name="email" placeholder="Введіть email" required/> 
+        </div>
+        <div class="form-group">
+            <label for="phone">Телефон</label>
+            <input type="tel" class="form-control" id="phone" name="phone" value="+380" required
+                   pattern="\+380\d{9}" title="Номер телефону має бути у форматі +380XXXXXXXXX"
+                   placeholder="+380991234567" maxlength="13" /> 
+        </div>
+        <div class="form-group">
+            <label for="date_of_birth">Дата народження</label>
+            <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" required />
+        </div>
+    </div>
+    
+    <div class="right-column">
+        <div class="form-group">
+            <label for="username">Ім'я користувача (Username)</label>
+            <input type="text" class="form-control" id="username" name="username" placeholder="Введіть username" required/> 
+        </div>
+        <div class="form-group">
+            <label for="password1">Пароль</label>
+            <input type="password" class="form-control" id="password1" name="password1" placeholder="Введіть пароль" required/> 
+        </div>
+        <div class="form-group">
+            <label for="department">Відділ:</label>
+            <select id="department" name="department_id" class="form-control" required>
+                <option value="" disabled selected>Оберіть відділ</option>
+                {% for department in departments %}
+                    <option value="{{ department.department_id }}">{{ department.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="title">Посада</label>
+            <input type="text" class="form-control" id="title" name="title" placeholder="Введіть посаду" required/> 
+        </div>
+        <div class="form-group">
+            <label for="role">Роль</label>
+            <select id="role" name="role" class="form-control" required>
+                <option value="" disabled selected>Оберіть роль</option>
+                {% for role in roles %}
+                    <option value="{{ role.role_id }}">{{ role.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="manager">Менеджер:</label>
+            <select id="manager" name="manager" class="form-control" disabled>
+                <option value="" disabled selected>Спочатку оберіть відділ</option>
+            </select>
+        </div>
+    </div>
+    
+    <div class="full-width-column">
+        <div class="button-group">
+            <button type="submit" class="btn btn-primary">Створити</button>
+            <a href="{{ url_for('admin_views.admin_dashboard') }}" class="btn btn-cancel">Скасувати</a>
+        </div>
+    </div>
+</form>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const departmentSelect = document.getElementById('department');
+        const managerSelect = document.getElementById('manager');
+
+        departmentSelect.addEventListener('change', function() {
+            const departmentId = this.value;
+            managerSelect.disabled = true;
+            managerSelect.innerHTML = '<option value="" disabled selected>Завантаження...</option>';
+
+            if (!departmentId) {
+                managerSelect.innerHTML = '<option value="" disabled selected>Спочатку оберіть відділ</option>';
+                return;
+            }
+
+            fetch(`/admin/api/managers/${departmentId}`)
+                .then(response => response.json())
+                .then(managers => {
+                    managerSelect.innerHTML = ''; // Очищуємо список
+                    if (managers.length > 0) {
+                        managerSelect.innerHTML = '<option value="" disabled selected>Оберіть менеджера</option>';
+                        managers.forEach(manager => {
+                            const option = document.createElement('option');
+                            option.value = manager.id;
+                            option.textContent = manager.full_name;
+                            managerSelect.appendChild(option);
+                        });
+                        managerSelect.disabled = false;
+                    } else {
+                        managerSelect.innerHTML = '<option value="" disabled selected>Менеджерів не знайдено</option>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching managers:', error);
+                    managerSelect.innerHTML = '<option value="" disabled selected>Помилка завантаження</option>';
+                });
+        });
+    });
+</script>
+
+{% endblock %}

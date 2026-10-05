@@ -1,0 +1,34 @@
+{% extends "admin/admin_dashboard.html" %}
+{% block title %}Управління пристроями{% endblock %}
+{% block content %}
+<h1>Список всіх пристроїв</h1>
+<table border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Назва</th>
+            <th>Тип</th>
+            <th>Серійний номер</th>
+            <th>Статус</th>
+            <th>Поточний власник</th>
+            <th>Дії</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for device in devices %}
+        <tr>
+            <td>{{ device.id }}</td>
+            <td>{{ device.name }}</td>
+            <td>{{ device.device_type.name }}</td>
+            <td>{{ device.serial_number }}</td>
+            <td>{{ device.status.value }}</td>
+            <td>{{ device.current_worker.full_name if device.current_worker else 'На складі' }}</td>
+            <td>
+                <a href="#">Редагувати</a> | 
+                <a href="#">Списати</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

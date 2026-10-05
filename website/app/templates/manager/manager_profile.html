@@ -1,0 +1,63 @@
+{% extends "manager/manager_base.html" %}
+{% block title %}Мій профіль{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <h2>Мій профіль</h2>
+
+    <div class="card mb-4">
+        <div class="card-header">Загальна інформація</div>
+        <div class="card-body">
+            <p><strong>Повне ім'я:</strong> {{ user.full_name }}</p>
+            <p><strong>Логін:</strong> {{ user.username }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
+            <p><strong>Телефон:</strong> {{ user.phone }}</p>
+            <p><strong>Дата народження:</strong> {{ user.date_of_birth.strftime("%d.%m.%Y") if user.date_of_birth }}</p>
+
+            <h5>Поточна посада:</h5>
+            {% if user.current_department_record %}
+                <p>
+                    <strong>Відділ:</strong> {{ user.current_department.name }} <br>
+                    <strong>Посада:</strong> {{ user.current_department_record.title }}
+                </p>
+            {% else %}
+                <p class="text-muted">Поточна посада не призначена.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">Редагування профілю</div>
+        <div class="card-body">
+            <form method="POST" class="simple-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required/>
+                </div>
+                
+                <div class="form-group">
+                    <label for="phone">Телефон</label>
+                    <input type="tel" class="form-control" id="phone" name="phone" value="{{ user.phone }}" required
+                           pattern="\+380\d{9}" title="Номер телефону має бути у форматі +380XXXXXXXXX" maxlength="13">
+                </div>
+
+                <hr>
+
+                <div class="form-group">
+                    <label for="password">Новий пароль</label>
+                    <input type="password" class="form-control" id="password" name="password" 
+                           placeholder="Залиште порожнім, щоб не змінювати">
+                </div>
+
+                <div class="form-group">
+                    <label for="password2">Підтвердження паролю</label>
+                    <input type="password" class="form-control" id="password2" name="password2" 
+                           placeholder="Повторіть новий пароль">
+                </div>
+
+                <button type="submit" class="btn btn-primary">Зберегти зміни</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

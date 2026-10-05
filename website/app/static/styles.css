@@ -1,0 +1,634 @@
+/*
+ * Drinks Co. Support Portal CSS
+ * -----------------------------
+ * Primary Dark: #2E6F40
+ * Primary Accent: #29AB87
+ * Background: #F5F5F5
+ */
+
+/* 1. CSS Variables & Base Setup
+----------------------------------- */
+:root {
+  --portal-dark-green: #2E6F40;
+  --portal-accent-green: #29AB87;
+  --portal-bg-light: #F5F5F5;
+  --portal-card-bg: #FFFFFF;
+  --portal-text-dark: #333;
+  --portal-text-light: #555;
+  --portal-nav-bg: #FFFFFF;
+  --portal-nav-hover: #eefaf6; /* A very light accent green */
+  --portal-border-color: #EAEAEA;
+
+  /* Sizing */
+  --nav-width: 250px;
+  --nav-width-closed: 88px;
+  --top-bar-height: 70px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  background-color: var(--portal-bg-light);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* 2. Sidebar Navigation (`<nav>`)
+----------------------------------- */
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: var(--nav-width);
+  background-color: var(--portal-nav-bg);
+  border-right: 1px solid var(--portal-border-color);
+  padding: 20px 15px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+nav .logo-name {
+  display: flex;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+nav .logo_name {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--portal-dark-green);
+  margin-left: 10px;
+  transition: all 0.2s ease;
+}
+
+nav .menu-items {
+  display: flex;
+  flex-direction: column;
+  flex: 1; /* <-- FIX 1: Fills *remaining* space */
+  justify-content: space-between;
+  overflow: hidden; /* <-- FIX 2: Prevents layout breaks */
+}
+
+/* Add this new rule */
+nav .nav-links {
+  overflow-y: auto; /* Makes just the main links scrollable */
+  overflow-x: hidden;
+}
+
+nav ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+nav ul li {
+  margin-bottom: 5px;
+}
+
+nav ul a {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  color: var(--portal-text-light);
+  padding: 12px 15px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  white-space: nowrap; /* Prevents text wrap during transition */
+}
+
+nav ul a:hover {
+  background-color: var(--portal-nav-hover);
+  color: var(--portal-accent-green);
+}
+
+nav ul a i {
+  font-size: 1.25rem;
+  margin-right: 15px;
+  width: 20px; /* Aligns icons */
+  text-align: center;
+}
+
+/* 3. Collapsed Sidebar State (`nav.close`)
+----------------------------------- */
+/* This shrinks the sidebar */
+nav.close {
+  width: var(--nav-width-closed);
+}
+
+/* This hides the text and logo name */
+nav.close .logo_name,
+nav.close .link-name {
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
+}
+
+/* FIX: This re-centers your icons */
+nav.close ul a {
+  padding: 12px 22px; /* Adjusts padding to center the icon */
+}
+
+/* FIX: This removes the right margin from the icon */
+nav.close ul a i {
+  margin-right: 0;
+}
+
+/* * FIX: This is the MOST IMPORTANT rule.
+ * It expands the main dashboard to fill the new space.
+*/
+nav.close ~ .dashboard {
+  left: var(--nav-width-closed);
+  width: calc(100% - var(--nav-width-closed));
+}
+
+/* * FIX: This is the 2nd MOST IMPORTANT rule.
+ * It expands the top bar to fill the new space.
+*/
+nav.close ~ .dashboard .top {
+  left: var(--nav-width-closed);
+  width: calc(100% - var(--nav-width-closed));
+}
+
+/* 4. Main Dashboard Section (`<section.dashboard>`)
+----------------------------------- */
+.dashboard {
+  position: relative;
+  left: var(--nav-width);
+  width: calc(100% - var(--nav-width));
+  min-height: 100vh;
+  background-color: var(--portal-bg-light);
+  padding: 20px;
+  /* Add padding-top to account for the fixed top bar */
+  padding-top: calc(var(--top-bar-height) + 20px);
+  transition: all 0.3s ease;
+}
+
+/* Adjust dashboard when sidebar is closed */
+nav.close ~ .dashboard {
+  left: var(--nav-width-closed);
+  width: calc(100% - var(--nav-width-closed));
+}
+
+/* 5. Top Bar (`.top`)
+----------------------------------- */
+.dashboard .top {
+  position: fixed;
+  top: 0;
+  left: var(--nav-width); /* Must match .dashboard's left */
+  width: calc(100% - var(--nav-width)); /* Must match .dashboard's width */
+  height: var(--top-bar-height);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  background-color: var(--portal-card-bg);
+  border-bottom: 1px solid var(--portal-border-color);
+  z-index: 900;
+  transition: all 0.3s ease;
+}
+
+/* Adjust .top when sidebar is closed */
+nav.close ~ .dashboard .top {
+  left: var(--nav-width-closed);
+  width: calc(100% - var(--nav-width-closed));
+}
+
+.dashboard .top .sidebar-toggle {
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--portal-text-dark);
+}
+
+.dashboard .top .search-box {
+  position: relative;
+}
+
+.dashboard .top .search-box input {
+  border: 1px solid var(--portal-border-color);
+  border-radius: 6px;
+  padding: 8px 12px 8px 35px; /* space for icon */
+  width: 300px;
+  outline: none;
+}
+.dashboard .top .search-box input:focus {
+  border-color: var(--portal-accent-green);
+}
+
+.dashboard .top .search-box i {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+}
+
+/* 6. Main Content (`.activity` & Table)
+----------------------------------- */
+.activity {
+  background-color: var(--portal-card-bg);
+  border-radius: 8px;
+  padding: 25px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+/* This is the new rule for the container */
+.activity-data {
+  /* This creates the horizontal scrollbar if the table is too wide */
+  overflow-x: auto;
+}
+
+.activity-data table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  
+  /* --- THIS IS THE FIX --- */
+  /* * Set a minimum width. This forces the table to be at least 
+   * 1000px wide. If the container is smaller, the scrollbar
+   * from .activity-data will appear. Adjust 1000px as needed.
+   */
+  min-width: 1000px; 
+}
+
+.activity-data th,
+.activity-data td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--portal-border-color);
+  vertical-align: middle;
+}
+
+.activity-data th {
+  background-color: #fcfcfc;
+  font-weight: 600;
+  color: var(--portal-text-dark);
+}
+
+.activity-data td {
+  font-size: 0.95em;
+  color: #444;
+}
+
+.activity-data tbody tr:hover {
+  background-color: var(--portal-nav-hover);
+}
+
+.activity-data tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.activity-data .text-muted {
+  color: #999;
+  font-style: italic;
+}
+
+/* 7. Buttons & Alerts
+----------------------------------- */
+.btn {
+  padding: 5px 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9em;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.2s ease;
+}
+
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 0.85em;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+.btn-danger:hover {
+  background-color: #c82333;
+}
+
+/* Flash Messages */
+.alert {
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  /* These will appear *inside* the .dashboard padding */
+}
+.alert-success {
+  color: #0f5132;
+  background-color: #d1e7dd;
+  border-color: #badbcc;
+}
+.alert-danger {
+  color: #842029;
+  background-color: #f8d7da;
+  border-color: #f5c2c7;
+}
+.alert-info {
+  color: #055160;
+  background-color: #cff4fc;
+  border-color: #b6effb;
+}
+
+
+/* The main "card" container for the form */
+.form-section {
+  background-color: var(--portal-card-bg);
+  border-radius: 8px;
+  padding: 30px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  max-width: 800px; /* Keeps the form from getting too wide */
+  margin: 0 auto;
+}
+
+/* Form Page Title */
+.form-section h2 {
+  color: var(--portal-dark-green);
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+/* Form Page Description (like in your screenshot) */
+.form-section p {
+  color: var(--portal-text-light);
+  margin-bottom: 25px;
+  font-size: 0.95em;
+}
+
+/* Spacing for each form group */
+.simple-form .form-group {
+  margin-bottom: 1.25rem;
+}
+
+/* Form Labels */
+.simple-form label {
+  display: block;
+  font-weight: 600;
+  color: var(--portal-text-dark);
+  margin-bottom: 8px;
+}
+
+/* General style for all form inputs */
+.simple-form select,
+.simple-form textarea,
+.simple-form input[type="text"],
+.simple-form input[type="number"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--portal-border-color);
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit; /* Use the same font as the body */
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.simple-form textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+/* Focus state for inputs */
+.simple-form select:focus,
+.simple-form textarea:focus,
+.simple-form input[type="text"]:focus,
+.simple-form input[type="number"]:focus {
+  outline: none;
+  border-color: var(--portal-accent-green);
+  box-shadow: 0 0 0 0.2rem rgba(41, 171, 135, 0.2);
+}
+
+/* * -----------------
+ * Buttons
+ * -----------------
+ */
+
+/* Primary Submit Button (green) */
+.btn-primary {
+  background-color: var(--portal-dark-green);
+  border-color: var(--portal-dark-green);
+  color: #fff;
+  font-weight: 600;
+  margin-right: 10px;
+  padding: 10px 15px;
+}
+
+.btn-primary:hover {
+  background-color: #245a33; /* Darker green */
+  border-color: #245a33;
+  color: #fff;
+}
+
+/* Cancel Button (gray) */
+.btn-cancel {
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  color: var(--portal-text-light);
+  font-weight: 600;
+  padding: 10px 15px;
+  text-decoration: none;
+}
+
+.btn-cancel:hover {
+  background-color: #e9e9e9;
+  border-color: #ccc;
+  color: var(--portal-text-dark);
+}
+
+
+/* * -----------------
+ * Dynamic Content
+ * -----------------
+ */
+
+/* Header for "Desired Characteristics" */
+#attributes-container h4 {
+  color: var(--portal-dark-green);
+  margin-bottom: 1rem;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--portal-border-color);
+}
+
+/* "Loading..." text */
+#attributes-container p {
+  color: var(--portal-text-light);
+  font-style: italic;
+  margin: 15px 0;
+}
+
+/* 1. Card container for the table */
+.table-section {
+  background-color: var(--portal-card-bg);
+  border-radius: 8px;
+  padding: 30px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+/* 2. Page Title */
+.table-section h2 {
+  color: var(--portal-dark-green);
+  font-weight: 600;
+  margin-bottom: 25px;
+}
+
+/* 3. Table Styling (matches dashboard table) */
+.table-section table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 600px; /* Prevents squishing */
+}
+
+.table-section th,
+.table-section td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid var(--portal-border-color);
+  vertical-align: middle;
+}
+
+.table-section th {
+  background-color: #fcfcfc;
+  font-weight: 600;
+  color: var(--portal-text-dark);
+}
+
+.table-section tbody tr:hover {
+  background-color: var(--portal-nav-hover);
+}
+
+/* Style for the "No devices" message */
+.table-section td[colspan="5"] {
+  text-align: center;
+  color: var(--portal-text-light);
+  font-style: italic;
+  padding: 20px;
+}
+
+/* 4. Custom Action Buttons */
+.btn-action {
+  padding: 4px 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #f0f0f0;
+  color: var(--portal-text-dark);
+  cursor: pointer;
+  font-size: 0.9em;
+  margin-right: 5px;
+  transition: all 0.2s ease;
+}
+.btn-action:hover {
+  background-color: #e6e6e6;
+  border-color: #bbb;
+}
+
+.btn-action.btn-warning {
+  background-color: #fff3cd;
+  border-color: #ffeeba;
+  color: #856404;
+}
+.btn-action.btn-warning:hover {
+  background-color: #ffeeba;
+  border-color: #ffc876;
+}
+
+.btn-action:disabled,
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #f5f5f5;
+}
+
+
+/*
+ * ----------------------------------------
+ * 10. Bootstrap Modal Theme Overrides
+ * ----------------------------------------
+ */
+
+.modal-content {
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.modal-header {
+  background-color: #f7f7f7;
+  border-bottom: 1px solid var(--portal-border-color);
+  color: var(--portal-dark-green);
+  font-weight: 600;
+}
+
+.modal-header .modal-title {
+  color: var(--portal-dark-green);
+  font-weight: 600;
+}
+
+/* "X" close button */
+.modal-header .close {
+  color: var(--portal-text-light);
+  outline: none;
+}
+.modal-header .close:hover {
+  color: var(--portal-text-dark);
+}
+
+.modal-body {
+  padding: 2rem;
+}
+
+.modal-body .form-group label {
+  font-weight: 600;
+  color: var(--portal-text-dark);
+}
+
+/* Style for the textarea inside the modal */
+.modal-body .form-control {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--portal-border-color);
+  border-radius: 6px;
+  font-size: 1rem;
+  min-height: 100px;
+}
+.modal-body .form-control:focus {
+  outline: none;
+  border-color: var(--portal-accent-green);
+  box-shadow: 0 0 0 0.2rem rgba(41, 171, 135, 0.2);
+}
+
+.modal-footer {
+  background-color: #f7f7f7;
+  border-top: 1px solid var(--portal-border-color);
+}
+
+/* Style for Bootstrap's .btn-secondary (Close button) */
+.btn-secondary {
+  background-color: #f0f0f0;
+  border: 1px solid #ddd;
+  color: var(--portal-text-light);
+  font-weight: 600;
+}
+.btn-secondary:hover {
+  background-color: #e9e9e9;
+  border-color: #ccc;
+  color: var(--portal-text-dark);
+}
+
+/* Style for Bootstrap's .btn-danger (Submit button) */
+.btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  font-weight: 600;
+}
+.btn-danger:hover {
+  background-color: #c82333;
+  border-color: #bd2130;
+}

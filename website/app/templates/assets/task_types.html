@@ -1,0 +1,20 @@
+{% extends "admin/admin_dashboard.html" %}
+{% block title %}Керування типами пристроїв{% endblock %}
+{% block content %}
+<h1>Керування типами пристроїв</h1>
+<table border="1">
+    <thead>
+        <tr><th>ID</th><th>Назва</th><th>Пріоритет</th><th>Дії</th></tr>
+    </thead>
+    <tbody>
+        {% for type in device_types %}
+        <tr>
+            <td>{{ type.id }}</td>
+            <td>{{ type.name }}</td>
+            <td>{{ type.priority }}</td>
+            <td><a href="#">Редагувати</a></td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

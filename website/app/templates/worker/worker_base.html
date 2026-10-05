@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    
+    <title>{% block title %}Панель Працівника{% endblock %}</title>
+</head>
+<body>
+    <nav>
+        <div class="logo-name">
+            <span class="logo_name"> IT Portal </span>
+        </div>
+        <div class="menu-items">
+            <ul class="nav-links">
+                <li><a href="{{ url_for('worker_views.worker_dashboard') }}">
+                    <i class="uil uil-clipboard-notes"></i>
+                    <span class="link-name"> Мої завдання </span>
+                </a></li>
+                </ul>
+            <ul class="logout-mod">
+                <li><a href="{{ url_for('worker_views.worker_profile') }}">
+                    <i class="uil uil-user-circle"></i>
+                    <span class="link-name"> Мій профіль</span>
+                </a></li>
+                <li><a href="{{ url_for('auth.logout') }}">
+                    <i class="uil uil-signout"></i>
+                    <span class="link-name"> Вийти</span>
+                </a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="dashboard">
+    
+
+        {% block content %}{% endblock %}
+    </section>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

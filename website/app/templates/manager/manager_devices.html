@@ -1,0 +1,174 @@
+{% extends "manager/manager_base.html" %}
+{% block title %}Manage Team Devices{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    
+    <div class="form-section">
+        <h2>Запит на новий пристрій</h2>
+        <form method="POST" class="simple-form">
+            <h4>Призначення: для відділу {{ current_user.current_department.name }}</h4>
+
+            <div class="form-group">
+                <label for="device_type_id">1. Оберіть тип пристрою:</label>
+                <select id="device_type_id" name="device_type_id" required>
+                    <option value="" disabled selected>-- Тип пристрою --</option>
+                    {% for type in device_types %}
+                        <option value="{{ type.id }}">{{ type.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div id="attributes-container">
+                </div>
+
+            <div class="form-group">
+                <label for="justification">2. Обґрунтування (навіщо потрібен пристрій):</label>
+                <textarea id="justification" name="justification" rows="3" 
+                          placeholder="Наприклад: Для нового співробітника, який почне працювати з наступного місяця." 
+                          required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Створити заявку</button>
+        </form>
+    </div>
+
+    <hr>
+
+    <div class="table-section">
+        <h2>Особисті пристрої (Призначені працівникам відділу) </h2>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Назва відділу</th>
+                    <th>Тип</th>
+                    <th>Серійний номер</th>
+                    <th>Статус</th>
+                    <th>Призначений</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for assignment in personal_assignments %}
+                <tr>
+                    <td>{{ assignment.device.name }}</td>
+                    <td>{{ assignment.device.device_type.name }}</td>
+                    <td>{{ assignment.device.serial_number }}</td>
+                    <td>{{ assignment.device.status.value|title }}</td>
+                    <td>{{ assignment.worker.full_name }}</td>  
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4">Жоден пристрій не був призначений вашим підлеглим. </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <hr>
+
+    <div class="table-section">
+        <h2>Пристрої відділу</h2>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Назва</th>
+                    <th>Тип</th>
+                    <th>Серійний номер</th>
+                    <th>Статус</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for assignment in department_assignments %}
+                <tr>
+                    <td>{{ assignment.device.name }}</td>
+                    <td>{{ assignment.device.device_type.name }}</td>
+                    <td>{{ assignment.device.serial_number }}</td>
+                    <td>{{ assignment.device.status.value|title }}</td>
+                    <td>
+                        <form action="{{ url_for('manager_views.return_department_device', device_department_id=assignment.id) }}"
+                  method="POST"
+                  style="display: inline;"
+                  onsubmit="return confirm('Ви впевнені, що хочете ініціювати повернення цього пристрою?')">
+                
+                <button type="submit"
+                        class="btn-action"
+                        {# --- ОСЬ КЛЮЧОВА ЗМІНА --- #}
+                        {# Перевіряємо, чи статус НЕ 'IN_USE' #}
+                        {% if assignment.device.status != DeviceStatusEnum.IN_USE %}
+                            disabled
+                            title="Повернути можна лише пристрій зі статусом 'In Use'."
+                        {% endif %}>
+                    Повернути пристрій
+                </button>
+            </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5">Жоден пристрій не призначений до вашого відділу.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const typeSelect = document.getElementById('device_type_id');
+        const attributesContainer = document.getElementById('attributes-container');
+
+        typeSelect.addEventListener('change', function() {
+            const typeId = this.value;
+            attributesContainer.innerHTML = '<p>Завантаження характеристик...</p>';
+
+            if (!typeId) {
+                attributesContainer.innerHTML = '';
+                return;
+            }
+
+            // AJAX-запит до нашого API, яке ми створили для адмінки
+            fetch(`/assets/api/attributes/${typeId}`)
+                .then(response => response.json())
+                .then(attributes => {
+                    attributesContainer.innerHTML = ''; // Очищуємо контейнер
+                    if (attributes.length > 0) {
+                         const header = document.createElement('h4');
+                         header.style.marginTop = '20px'; // Додамо відступ
+                         header.textContent = "Бажані характеристики (необов'язково)";
+                         attributesContainer.appendChild(header);
+                    }
+                    
+                    attributes.forEach(attr => {
+                        const formGroup = document.createElement('div');
+                        formGroup.className = 'form-group';
+                        
+                        const label = document.createElement('label');
+                        label.htmlFor = `attr_${attr.id}`;
+                        label.textContent = attr.name;
+                        
+                        const input = document.createElement('input');
+                        if (attr.data_type === 'integer' || attr.data_type === 'decimal') {
+                            input.type = 'number';
+                            input.step = (attr.data_type === 'decimal') ? '0.1' : '1';
+                        } else {
+                            input.type = 'text';
+                        }
+                        input.id = `attr_${attr.id}`;
+                        input.name = `attr_${attr.id}`;
+                        input.className = 'form-control';
+                        input.placeholder = `Введіть ${attr.name.toLowerCase()}`;
+                        
+                        formGroup.appendChild(label);
+                        formGroup.appendChild(input);
+                        attributesContainer.appendChild(formGroup);
+                    });
+                })
+                .catch(error => console.error('Error fetching attributes:', error));
+        });
+    });
+</script>
+{% endblock %}

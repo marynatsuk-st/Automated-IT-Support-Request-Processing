@@ -1,0 +1,38 @@
+{% extends "worker/worker_base.html" %}
+{% block title %}Завдання #{{ task.id }}: Запит на пристрій{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <hr>
+
+    <div class="form-section">
+        <h3>Призначити пристрій</h3>
+        <p>Система проаналізувала запит та відсортувала доступні пристрої за рівнем відповідності.</p>
+        <form method="POST" class="simple-form">
+            <input type="hidden" name="target_info" value="{{ target_info_str }}">
+            
+            <div class="form-group">
+                <label for="device_id">Рекомендовані пристрої:</label>
+                <select id="device_id" name="device_id" required>
+                    <option value="" disabled selected>-- Оберіть пристрій --</option>
+                    {% for item in recommendations %}
+                        <option value="{{ item.device.id }}">
+                            {{ item.device.name }} (SN: {{ item.device.serial_number }}) - 
+                            <strong>Відповідність: {{ item.score }} / {{ total_score }}</strong>
+                        </option>
+                    {% else %}
+                        <option disabled>На складі немає доступних пристроїв цього типу.</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary" {% if not recommendations %}disabled{% endif %}>
+                    Призначити обраний пристрій
+                </button>
+                <a href="{{ url_for('worker_views.worker_dashboard') }}" class="btn btn-cancel">Повернутися до списку</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

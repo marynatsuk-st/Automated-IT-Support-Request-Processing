@@ -1,0 +1,53 @@
+{% extends "worker/worker_base.html" %}
+{% block title %}Мої завдання{% endblock %}
+
+{% block content %}
+<div class="top">
+    <i class="uil uil-bars sidebar-toggle"></i>
+    <div class="search-box">
+        <i class="uil uil-search"></i>
+        <input type="text" placeholder="Пошук завдань...">
+    </div>
+</div>
+
+<div class="activity">
+    <div class="activity-data">
+        <table>
+            <thead>
+    <tr>
+        <th>ID Завдання</th>
+        <th>Тип</th>
+        <th>Текст</th>
+        <th>Замовник</th>
+        <th>Статус Завдання</th> {# B-) Додано/Змінено #}
+        <th>Статус Призначення</th> {# B-) Змінено #}
+        <th>Призначено</th>
+        <th>Дії</th>
+    </tr>
+</thead>
+<tbody>
+    {% for assignment in assignments %}
+    <tr>
+        <td>{{ assignment.task.id }}</td>
+        <td>{{ assignment.task.active_task_type.name if assignment.task.active_task_type else 'N/A' }}</td>
+        <td title="{{ assignment.task.text }}">{{ assignment.task.text|truncate(80) }}</td>
+        <td>{{ assignment.task.customer.full_name if assignment.task.customer else 'N/A' }}</td>
+        {# B-) Показуємо статус самого завдання #}
+        <td>{{ assignment.task.status.value|replace('_', ' ')|title }}</td> 
+        {# B-) Показуємо статус цього конкретного призначення #}
+        <td>{{ assignment.status.value|replace('_', ' ')|title }}</td> 
+        <td>{{ assignment.assigned_at.strftime("%d.%m.%Y %H:%M") }}</td>
+        <td>
+            <a href="{{ url_for('worker_views.view_task', task_id=assignment.task.id) }}" class="btn btn-primary">Переглянути деталі</a>
+        </td>
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="8">Вам не призначено жодних завдань.</td>
+    </tr>
+    {% endfor %}
+</tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

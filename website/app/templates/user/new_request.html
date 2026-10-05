@@ -1,0 +1,33 @@
+{% extends "user/user_base.html" %} 
+{% block title %}Нова заявка{% endblock %} 
+
+{% block content %}
+<div class="top">
+    <i class="uil uil-bars sidebar-toggle"></i>
+    </div>
+
+<div class="content-container">
+    <div class="form-section">
+        <h2>Створення нової заявки</h2>
+        <p class="form-description">Будь ласка, детально опишіть вашу проблему або запит. Система автоматично визначить тип завдання та призначить відповідального виконавця.</p>
+        
+        <form method="POST" class="simple-form">
+            <div class="form-group">
+                <label for="request_text">Опис проблеми:</label>
+                <textarea class="form-control large-input" 
+                          id="request_text" 
+                          name="request_text" 
+                          rows="6"
+                          placeholder="Наприклад: Не можу підключитися до мережевого принтера у кабінеті 105. Потрібна допомога з налаштуванням." 
+                          required 
+                          minlength="10"></textarea>
+            </div>
+            
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">Відправити заявку</button>
+                <a href="{{ url_for('user_views.user_dashboard') }}" class="btn btn-cancel">Скасувати</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

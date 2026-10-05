@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Профіль працівника</h2>
+
+  {% if profile_data %}
+    {% for p in profile_data %}
+    <div class="card mb-3">
+      <div class="card-header">
+        <strong>{{ p.surname }} {{ p.name }}</strong> ({{ p.username }})
+      </div>
+      <div class="card-body">
+        <p><b>Email:</b> {{ p.email }}</p>
+        <p><b>Телефон:</b> {{ p.phone }}</p>
+        <p><b>Дата народження:</b> {{ p.date_of_birth or "—" }}</p>
+
+        <hr>
+        <h5>Департамент</h5>
+        <ul>
+          <li><b>ID:</b> {{ p.department_id }}</li>
+          <li><b>Назва:</b> {{ p.department_name or "—" }}</li>
+          <li><b>Посада:</b> {{ p.department_title or "—" }}</li>
+          <li><b>Статус:</b> {{ p.department_status or "—" }}</li>
+          <li><b>Період:</b> {{ p.department_start_date or "—" }} – {{ p.department_end_date or "—" }}</li>
+        </ul>
+
+        <h5>Роль</h5>
+        <ul>
+          <li><b>ID:</b> {{ p.role_id }}</li>
+          <li><b>Назва:</b> {{ p.role_name or "—" }}</li>
+          <li><b>Статус:</b> {{ p.role_status or "—" }}</li>
+          <li><b>Період:</b> {{ p.role_start_date or "—" }} – {{ p.role_end_date or "—" }}</li>
+        </ul>
+
+        <h5>Task Type</h5>
+        <ul>
+          <li><b>ID:</b> {{ p.tasktype_id }}</li>
+          <li><b>Назва:</b> {{ p.tasktype_name or "—" }}</li>
+          <li><b>Статус:</b> {{ p.tasktype_status or "—" }}</li>
+          <li><b>Період:</b> {{ p.tasktype_start_date or "—" }} – {{ p.tasktype_end_date or "—" }}</li>
+        </ul>
+      </div>
+    </div>
+    {% endfor %}
+  {% else %}
+    <p>Немає даних для відображення.</p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,53 @@
+{% extends "worker/worker_base.html" %}
+{% block title %}Завдання #{{ task.id }}: Ремонт пристрою{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <div class="info-section">
+        <h2>Завдання #{{ task.id }}: {{ task.active_task_type.name }}</h2>
+        <p><strong>Замовник (Ініціатор):</strong> {{ task.customer.full_name }} (Відділ: {{ task.customer.current_department.name if task.customer and task.customer.current_department else 'N/A' }})</p>
+        <p><strong>Створено:</strong> {{ task.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+        <p><strong>Поточний статус завдання:</strong> {{ assignment.status.value|title }}</p>
+        <hr>
+        <h4>Інформація про пристрій, що ремонтується:</h4>
+        <p><strong>Назва:</strong> {{ device.name }}</p>
+        <p><strong>Тип:</strong> {{ device.device_type.name }}</p>
+        <p><strong>Серійний номер:</strong> {{ device.serial_number }}</p>
+        <p><strong>Поточний статус пристрою:</strong> {{ device.status.value|title }}</p>
+        <hr>
+        <h4>Текст заявки / Опис проблеми:</h4>
+        <pre>{{ task.text }}</pre>
+    </div>
+
+    <hr>
+
+    <div class="form-section">
+        <h3>Завершити ремонт</h3>
+        <p>Вкажіть результат виконаного ремонту.</p>
+        <form method="POST" class="simple-form">
+            <div class="form-group">
+                <label>Оберіть статус пристрою після ремонту:</label>
+                <div class="radio-group">
+                    <label>
+                        <input type="radio" name="repair_outcome" value="fixed" checked>
+                        Відремонтовано (Available)
+                    </label>
+                    <label>
+                        <input type="radio" name="repair_outcome" value="decommissioned">
+                        Списати (Decommissioned)
+                    </label>
+                </div>
+            </div>
+             <div class="form-group">
+                <label for="comment">Коментар щодо ремонту (необов'язково):</label>
+                <textarea id="comment" name="comment" rows="3" placeholder="Опишіть виконані роботи або причину списання">{{ assignment.comment or '' }}</textarea>
+            </div>
+            
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">Завершити завдання</button>
+                <a href="{{ url_for('worker_views.worker_dashboard') }}" class="btn btn-cancel">Повернутися до списку</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

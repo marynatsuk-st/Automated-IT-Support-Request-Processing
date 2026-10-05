@@ -1,0 +1,61 @@
+{% extends "manager/manager_base.html" %}
+{% block title %}Керування працівниками{% endblock %}
+
+{% block content %}
+<div class="top">
+    <i class="uil uil-bars sidebar-toggle"></i>
+    <div class="search-box">
+        <i class="uil uil-search"></i>
+        <input type="text" placeholder="Пошук працівника...">
+    </div>
+</div>
+
+<div class="activity">
+    <div class="activity-data">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Прізвище</th>
+                    <th>Ім'я</th>
+                    <th>Email</th>
+                    <th>Телефон</th>
+                    <th>Посада</th>
+                    <th>Статус</th>
+                    <th>Компетенції</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody id="managerWorkerTableBody">
+                {% for subordinate in subordinates %}
+                <tr>
+                    <td>{{ subordinate.worker_id }}</td>
+                    <td>{{ subordinate.surname }}</td>
+                    <td>{{ subordinate.name }}</td>
+                    <td>{{ subordinate.email }}</td>
+                    <td>{{ subordinate.phone }}</td>
+                    <td>{{ subordinate.current_department_record.title if subordinate.current_department_record else 'N/A' }}</td>
+                    <td>{{ subordinate.worker_status.value|title }}</td>
+                    <td>
+                        <ul>
+                            {% for competency in subordinate.task_type_competencies %}
+                                {% if competency.status == HistoryStatusEnum.ACTIVE %}
+                                    <li>{{ competency.task_type.name }}</li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('manager_views.edit_worker_profile', user_id=subordinate.worker_id) }}" class="btn-action">Редагувати</a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="9">У вашому підпорядкуванні немає працівників.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

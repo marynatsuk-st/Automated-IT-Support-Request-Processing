@@ -1,0 +1,64 @@
+{% extends "admin/admin_base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="activity">
+    <div class="activity-data">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Прізвище</th> <th>Ім'я</th>     <th>Username</th>
+                    <th>Email</th>
+                    <th>Телефон</th>
+                    <th>Дата народження</th>
+                    <th>Відділ</th>
+                    <th>Роль</th>
+                    <th>Посада</th>
+                    <th>Статус</th>
+                    <th>Дія</th>
+                    <th>Редагувати</th>
+                </tr>
+            </thead>
+            <tbody id="managerUserTable">
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.worker_id }}</td>
+                    <td>{{ user.surname }}</td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.phone }}</td>
+                    <td>
+                        {% if user.date_of_birth %}
+                            {{ user.date_of_birth.strftime('%Y-%m-%d') }}
+                        {% endif %}
+                    </td>
+                    <td>{{ user.current_department.name if user.current_department else 'N/A' }}</td>
+                    <td>{{ user.current_role.name if user.current_role else 'N/A' }}</td>
+                    
+                    <td>{{ user.current_department_record.title if user.current_department_record else 'N/A' }}</td>
+                    
+                    <td>{{ user.worker_status.value }}</td>
+                    
+                    <td>
+                        <form action="{{ url_for('admin_views.deactivate_user', user_id=user.worker_id) }}" method="post">
+                            <button type="submit" 
+                                    class="btn btn-danger"
+                                    {% if user.worker_status == WorkerStatusEnum.INACTIVE %}disabled{% endif %}>
+                                Деактивувати
+                            </button>
+                        </form>
+                    </td>
+                    <td>
+                        <a href="{{ url_for('admin_views.edit_user', user_id=user.worker_id) }}" class="btn btn-primary">
+                            Редагувати
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

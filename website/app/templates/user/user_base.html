@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>{% block title %}Портал Замовника{% endblock %}</title>
+</head>
+<body>
+    
+    <nav>
+        <div class="logo-name">
+            <span class="logo_name"> IT Portal </span>
+        </div>
+        <div class="menu-items">
+            <ul class="nav-links">
+                <li><a href="{{ url_for('user_views.user_dashboard') }}">
+                    <i class="uil uil-check"></i>
+                    <span class="link-name"> Мої заявки </span>
+                </a></li>
+                <li><a href="{{ url_for('user_views.new_request') }}"> 
+                    <i class="uil uil-envelope-upload"></i>
+                    <span class="link-name"> Створити заявку </span>
+                </a></li>
+                <li><a href="{{ url_for('user_views.user_devices') }}"> 
+                    <i class="uil uil-laptop"></i>
+                    <span class="link-name"> Мої пристрої</span>
+                </a></li>
+                <li><a href="{{ url_for('user_views.new_personal_device_request') }}">
+                    <i class="uil uil-envelope-upload"></i>
+                    <span class="link-name"> Запит на пристрій</span>
+                </a></li>
+            </ul>
+            
+            <ul class="logout-mod">
+                 <li><a href="{{ url_for('user_views.user_profile') }}">
+                    <i class="uil uil-user-circle"></i>
+                    <span class="link-name"> Мій профіль</span>
+                </a></li>
+                <li><a href="{{ url_for('auth.logout') }}">
+                    <i class="uil uil-signout"></i>
+                    <span class="link-name"> Вийти</span>
+                </a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="dashboard">
+        
+        <div class="top">
+            <i class="uil uil-bars sidebar-toggle"></i>
+            <div class="search-box">
+                <i class="uil uil-search"></i>
+                <input type="text" placeholder="Пошук заявок...">
+            </div>
+            
+            </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+        
+    </section>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    {% block scripts %}
+
+    {% endblock %}
+</body>
+</html>

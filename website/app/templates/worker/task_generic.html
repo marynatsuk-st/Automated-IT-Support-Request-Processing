@@ -1,0 +1,73 @@
+{% extends "worker/worker_base.html" %}
+{% block title %}Завдання #{{ task.id }}{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <div class="info-section">
+        <h2>Завдання #{{ task.id }}: {{ task.active_task_type.name if task.active_task_type else 'N/A' }}</h2>
+        <p><strong>Замовник:</strong> {{ task.customer.full_name }} (Відділ: {{ task.customer.current_department.name if task.customer and task.customer.current_department else 'N/A' }})</p>
+        <p><strong>Створено:</strong> {{ task.created_at.strftime('%d.%m.%Y %H:%M') }}</p>
+        <p><strong>Поточний статус призначення:</strong> {{ assignment.status.value|replace('_', ' ')|title }}</p>
+        <hr>
+        <h4>Текст заявки:</h4>
+        <pre>{{ task.text }}</pre>
+        {% if assignment.comment %}
+            <hr>
+            <h4>Коментар:</h4>
+            <pre>{{ assignment.comment }}</pre>
+        {% endif %}
+    </div>
+
+    <hr>
+
+    <div class="form-section">
+        <h3>Оновити статус / Додати коментар</h3>
+        <form method="POST" class="simple-form">
+            <div class="form-group">
+                <label for="assignment_status">Новий статус:</label>
+                <select id="assignment_status" name="assignment_status" required>
+                    {% for status in available_statuses %}
+                        <option value="{{ status.value }}" {% if assignment.status == status %}selected{% endif %}>
+                            {{ status.value|replace('_', ' ')|title }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="comment">Коментар (необов'язково):</label>
+                <textarea id="comment" name="comment" rows="3">{{ assignment.comment or '' }}</textarea>
+            </div>
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">Зберегти зміни</button>
+                <a href="{{ url_for('worker_views.worker_dashboard') }}" class="btn btn-cancel">Повернутися до списку</a>
+            </div>
+        </form>
+    </div>
+    {% if assignment.status == WorkerTaskStatusEnum.ACTIVE %} {# Кнопки доступні тільки для активних #}
+    <hr>
+    <div class="form-section">
+        <h3>Інші дії</h3>
+        
+        {# Форма повернення менеджеру #}
+        <form method="POST" action="{{ url_for('worker_views.return_task_to_manager', workertask_id=assignment.id) }}" class="simple-form inline-form" onsubmit="return confirm('Повернути завдання менеджеру для перевірки типу?')">
+             <div class="form-group">
+                <label for="return_reason">Причина повернення (невірний тип):</label>
+                <input type="text" id="return_reason" name="return_reason" required minlength="5" placeholder="Вкажіть, чому тип невірний">
+             </div>
+             <button type="submit" class="btn btn-warning">Повернути менеджеру</button>
+        </form>
+        
+        <br> {# Невеликий відступ між формами #}
+
+        {# Форма відмови від завдання #}
+         <form method="POST" action="{{ url_for('worker_views.reject_task', workertask_id=assignment.id) }}" class="simple-form inline-form" onsubmit="return confirm('Відмовитись від виконання цього завдання?')">
+             <div class="form-group">
+                <label for="reject_reason">Причина відмови:</label>
+                 <input type="text" id="reject_reason" name="reject_reason" required minlength="5" placeholder="Вкажіть причину відмови">
+             </div>
+             <button type="submit" class="btn btn-danger">Відмовитись</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

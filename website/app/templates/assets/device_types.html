@@ -1,0 +1,60 @@
+{% extends "admin/admin_dashboard.html" %}
+{% block title %}Керування типами пристроїв{% endblock %}
+
+{% block content %}
+<div class="content-container">
+    <div class="form-section">
+        <h2>Створити новий тип пристрою</h2>
+        <form method="POST" class="simple-form">
+            <div class="form-group">
+                <label for="name">Назва типу</label>
+                <input type="text" id="name" name="name" placeholder="Наприклад, Ноутбук" required minlength="2">
+            </div>
+            <div class="form-group">
+                <label for="priority">Пріоритет (1-5)</label>
+                <input type="number" id="priority" name="priority" value="1" min="1" max="5" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Створити</button>
+        </form>
+    </div>
+
+    <hr>
+
+    <div class="table-section">
+        <h2>Існуючі типи пристроїв</h2>
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Назва</th>
+                    <th>Пріоритет</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for type in device_types %}
+                <tr>
+                    <td>{{ type.id }}</td>
+                    <td>{{ type.name }}</td>
+                    <td>{{ type.priority }}</td>
+                    <td>
+                        <a href="{{ url_for('asset_views.edit_device_type', type_id=type.id) }}" class="btn-edit">Редагувати</a> | 
+                        <form action="{{ url_for('asset_views.delete_device_type', type_id=type.id) }}" method="POST" style="display: inline;">
+                        <button type="submit" 
+                                class="btn-delete"
+                                onclick="return confirm('Ви впевнені, що хочете видалити цей тип? Цю дію не можна буде скасувати.')">
+                            Видалити
+                        </button>
+                    </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4">Жодного типу пристроїв ще не створено.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

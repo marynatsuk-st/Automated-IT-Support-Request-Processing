@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.8/css/line.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+    <title> {% block title %}Admin Dashboard{% endblock %} </title>
+</head>
+
+<body>
+    <nav>
+        <div class="logo-name">
+            <span class="logo_name"> IT portal </span>
+        </div>
+
+        <div class="menu-items">
+            <ul class="nav-links">
+                <li><a href="/admin/admin_dashboard">
+                        <i class="uil uil-check"></i>
+                        <span class="link-name"> All users </span>
+                    </a></li>
+                <li><a href="/admin/create_user">
+                        <i class="uil uil-laptop"></i>
+                        <span class="link-name"> Create a new user </span>
+                    </a></li>
+            </ul>
+
+            <ul class="logout-mod">
+                <li><a href="/logout">
+                        <i class="uil uil-signout"></i>
+                        <span class="link-name"> Sign out</span>
+                    </a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="dashboard">
+        {% block content %}
+        <table border="1">
+                    <thead>
+                        <tr>
+                            <th class="sortable" data-column="0">ID</th>
+                            <th class="sortable" data-column="1">First Name</th>
+                            <th class="sortable" data-column="2">Last Name</th>
+                            <th class="sortable" data-column="3">Username</th>
+                            <th class="sortable" data-column="4">Email</th>
+                            <th class="sortable" data-column="5">Phone</th>
+                            <th class="sortable" data-column="6">Date of birth</th>
+                            <th class="sortable department">Department</th>
+                            <th class="sortable role">Role</th>
+                            <th class="sortable" data-column="7">Title</th>
+                            <th class="sortable" data-column="8">Status</th>
+                            <th>Action</th>
+                            <th>Edit</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminUserTable">
+                        {% for user, department, role, work_status, title in users %}
+                    <tr>
+                        <td>{{ user.worker_id or 'null' }}</td>
+                        <td>{{ user.surname or 'null' }}</td>
+                        <td>{{ user.name or 'null' }}</td>
+                        <td>{{ user.username or 'null' }}</td>
+                        <td>{{ user.email or 'null' }}</td>
+                        <td>{{ user.phone or 'null' }}</td>
+                        <td>
+                            {% if user.date_of_birth %}
+                                {{ user.date_of_birth.strftime('%Y-%m-%d') }}
+                            {% else %}
+                                null
+                            {% endif %}
+                        </td>
+                        <td>{{ department or 'null' }}</td>
+                        <td>{{ role or 'null' }}</td>
+                        <td>{{ title or 'null' }}</td>
+                        <td>{{ user.worker_status or 'null' }}</td>
+                        <td>
+                            <form action="{{ url_for('admin_views.delete_user', user_id=user.worker_id) }}" method="post">
+                                <button
+                                    class="rectangular-button {% if user.status == 'inactive' %}disabled-button{% endif %}"
+                                    type="submit" {% if user.status=='inactive' %}disabled{% endif
+                                    %}>FINISH DISABLE BUTTON</button>
+                            </form>
+                        </td>
+
+                        <td>
+                            <a href="{{ url_for('admin_views.edit_user', user_id=user.worker_id) }}"
+                                class="rectangular-button {% if user.status == 'inactive' %}disabled-button{% endif %}"
+                                {% if user.status=='inactive' %}disabled{% endif %}>Edit</a>
+                        </td>
+                    </tr>
+        {% endfor %}
+                    </tbody>
+                </table>
+        {% endblock %}
+        </div>
+    </section>
+
+
+</body>
+</html>
