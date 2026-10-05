@@ -13,7 +13,7 @@ An end-to-end intelligent web application designed to automate support request w
 
 ---
 
-## 🧠 NLP Pipeline & Machine Learning Models
+## NLP Pipeline & Machine Learning Models
 
 ### Stage 1: Binary Classifier (Noise & Relevance Filtering)
 * **Goal:** Distinguish relevant IT requests from irrelevant non-IT messages (e.g., HR queries, general chit-chat, news) to eliminate non-target noise before downstream processing.
@@ -54,7 +54,7 @@ An end-to-end intelligent web application designed to automate support request w
 
 The system relies on a relational database architecture designed to manage users, roles, support requests, and competency mappings:
 
-![Database Diagram](./assets/db_schema.png) <!-- Update image path as needed -->
+![Database Diagram](./pictures/db_scheme.drawio.png)
 
 ### Key Entities:
 * **Users / Accounts:** Stores credentials, user profiles, and assigned roles (`Worker`, `Manager`, `Client`).
@@ -68,7 +68,7 @@ The system relies on a relational database architecture designed to manage users
 
 Once a request is classified, the system dynamically routes the task using a rule-based optimization engine:
 
-![BPMN Workflow Diagram](./assets/bpmn_workflow.png) <!-- Update image path as needed -->
+![BPMN Workflow Diagram](./pictures/bpmn.drawio.png)
 
 ### Workflow Logic:
 1. **Candidate Pool Selection:** Queries active personnel with the `Worker` role matching the designated task competence.
@@ -99,7 +99,7 @@ Once a request is classified, the system dynamically routes the task using a rul
 
 ---
 
-## 🛠️ Tech Stack & Requirements
+## Tech Stack & Requirements
 
 * **Language:** Python 3.8+
 * **NLP & Deep Learning:** Hugging Face `transformers`, PyTorch, Scikit-learn
